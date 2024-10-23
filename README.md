@@ -1,4 +1,4 @@
-# limoncello
+# 🍋 limoncello
 
 A simple app (made with AI) to calculate the alc/vol proportions of limoncello
 
