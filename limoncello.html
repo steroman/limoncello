@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore Gradazione Alcolica</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, select {
+            padding: 8px;
+            width: 200px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Calcolatore Gradazione Alcolica</h1>
+
+    <!-- Sezione 1: Calcolo della gradazione alcolica -->
+    <h2>Calcola gradazione con ingredienti noti</h2>
+    <form id="calcForm">
+        <label for="zucchero">Zucchero (g):</label>
+        <input type="number" id="zucchero" placeholder="550" required>
+
+        <label for="acqua">Acqua (ml):</label>
+        <input type="number" id="acqua" placeholder="1000" required>
+
+        <label for="alcool">Alcool (ml):</label>
+        <input type="number" id="alcool" placeholder="500" required>
+
+        <label for="gradAlcool">Gradazione Alcool (% vol):</label>
+        <input type="number" id="gradAlcool" placeholder="95" required>
+
+        <button type="button" onclick="calcolaGradazione()">Calcola Gradazione</button>
+    </form>
+
+    <div id="result"></div>
+
+    <!-- Sezione 2: Calcolo acqua e zucchero dati alcool e gradazione desiderata -->
+    <h2>Calcola acqua e zucchero per ottenere una gradazione desiderata</h2>
+    <form id="invForm">
+        <label for="alcoolInverso">Alcool (ml):</label>
+        <input type="number" id="alcoolInverso" placeholder="500" required>
+
+        <label for="gradAlcoolInverso">Gradazione Alcool (% vol):</label>
+        <input type="number" id="gradAlcoolInverso" placeholder="95" required>
+
+        <label for="gradDesiderata">Gradazione desiderata (% vol):</label>
+        <input type="number" id="gradDesiderata" placeholder="30" required>
+
+        <label for="proporzione">Proporzione acqua:zucchero (es: 3:4):</label>
+        <input type="text" id="proporzione" placeholder="3:4" required>
+
+        <button type="button" onclick="calcolaAcquaZucchero()">Calcola Acqua e Zucchero</button>
+    </form>
+
+    <div id="resultInv"></div>
+
+    <script>
+        function calcolaGradazione() {
+            // Leggi i valori inseriti dall'utente
+            let zucchero = parseFloat(document.getElementById('zucchero').value);
+            let acqua = parseFloat(document.getElementById('acqua').value);
+            let alcool = parseFloat(document.getElementById('alcool').value);
+            let gradAlcool = parseFloat(document.getElementById('gradAlcool').value);
+
+            // Calcola il volume dello zucchero
+            let pesoSpecZucchero = 1.59;
+            let volumeZucchero = zucchero / pesoSpecZucchero;
+
+            // Somma i volumi
+            let volumeTotale = volumeZucchero + acqua + alcool;
+
+            // Calcola il volume alcolico dell'alcool
+            let volumeAlcolicoAlcool = alcool * (gradAlcool / 100);
+
+            // Calcolo della gradazione alcolica finale
+            let gradazioneFinale = (volumeAlcolicoAlcool / volumeTotale) * 100;
+
+            // Mostra il risultato
+            document.getElementById('result').innerHTML = `La gradazione alcolica è: ${gradazioneFinale.toFixed(2)}% vol`;
+        }
+
+        function calcolaAcquaZucchero() {
+            // Leggi i valori inseriti dall'utente
+            let alcool = parseFloat(document.getElementById('alcoolInverso').value);
+            let gradAlcool = parseFloat(document.getElementById('gradAlcoolInverso').value);
+            let gradDesiderata = parseFloat(document.getElementById('gradDesiderata').value);
+            let proporzione = document.getElementById('proporzione').value;
+
+            // Estrai la proporzione acqua:zucchero
+            let proporzioni = proporzione.split(":").map(Number);
+            let proporzioneAcqua = proporzioni[0];
+            let proporzioneZucchero = proporzioni[1];
+
+            // Calcola il volume totale desiderato per raggiungere la gradazione specificata
+            let volumeTotaleDesiderato = (alcool * gradAlcool) / gradDesiderata;
+
+            // Calcola la somma delle proporzioni
+            let sommaProporzioni = proporzioneAcqua + proporzioneZucchero;
+
+            // Calcola il volume di acqua e zucchero in base alla proporzione scelta
+            let acqua = volumeTotaleDesiderato * (proporzioneAcqua / sommaProporzioni) - alcool;
+            let zucchero = volumeTotaleDesiderato * (proporzioneZucchero / sommaProporzioni) * 1.59; // Riporta in grammi
+
+            // Mostra il risultato
+            document.getElementById('resultInv').innerHTML = `
+                Per ottenere ${gradDesiderata}% vol di gradazione:<br>
+                - Aggiungi ${acqua.toFixed(2)} ml di acqua<br>
+                - Aggiungi ${zucchero.toFixed(2)} grammi di zucchero
+            `;
+        }
+    </script>
+
+</body>
+</html>
