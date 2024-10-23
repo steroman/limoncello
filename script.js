@@ -29,24 +29,21 @@ function calcolaAcquaZucchero() {
     let gradDesiderata = parseFloat(document.getElementById('gradDesiderata').value);
     let proporzione = document.getElementById('proporzione').value;
 
-    // Estrai la proporzione acqua:zucchero dal dropdown
+    // Estrai la proporzione zucchero:acqua dal dropdown
     let proporzioni = proporzione.split(":").map(Number);
-    let proporzioneZucchero = proporzioni[0];
-    let proporzioneAcqua = proporzioni[1];
+    let proporzioneZucchero = proporzioni[0];  // Es. 8 parti zucchero (in grammi)
+    let proporzioneAcqua = proporzioni[1];     // Es. 11 parti acqua (in ml)
 
     // Calcola il volume totale desiderato per raggiungere la gradazione specificata
     let volumeTotaleDesiderato = (alcool * gradAlcool) / gradDesiderata;
 
-    // Calcola il volume di acqua e zucchero necessario
-    let volumeAggiuntivo = volumeTotaleDesiderato - alcool; // volume di acqua + zucchero da aggiungere
-    let sommaProporzioni = proporzioneZucchero + proporzioneAcqua;
+    // Calcola il volume di acqua + zucchero da aggiungere
+    let volumeAggiuntivo = volumeTotaleDesiderato - alcool; // volume totale da aggiungere (acqua + zucchero)
 
-    // Distribuisci il volume tra zucchero e acqua in base alla proporzione scelta
-    let zuccheroVolume = volumeAggiuntivo * (proporzioneZucchero / sommaProporzioni);
-    let acqua = volumeAggiuntivo * (proporzioneAcqua / sommaProporzioni);
-
-    // Converti il volume dello zucchero in grammi
-    let zuccheroPeso = zuccheroVolume * 1.59;
+    // Calcolo di acqua e zucchero rispettando la proporzione
+    let rapportoAcquaZucchero = proporzioneAcqua / proporzioneZucchero; // es. 11/8
+    let acqua = volumeAggiuntivo / (1 + (1 / rapportoAcquaZucchero)); // volume acqua in ml
+    let zuccheroPeso = acqua / rapportoAcquaZucchero; // zucchero in grammi
 
     // Mostra il risultato
     document.getElementById('resultInv').innerHTML = `

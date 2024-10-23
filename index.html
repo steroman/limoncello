@@ -3,47 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcolatore Gradazione Alcolica</title>
+    <title>Limoncello, il calcolatore di gradazione alcolica</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍋</text></svg>">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>Calcolatore Gradazione Alcolica</h1>
+    <h1>Calcolatore gradazione alcolica</h1>
 
     <!-- Sezione 1: Calcolo della gradazione alcolica -->
     <h2>Calcola gradazione con ingredienti noti</h2>
     <form id="calcForm">
-        <label for="zucchero">Zucchero (g):</label>
+        <label for="zucchero">Zucchero (g)</label>
         <input type="number" id="zucchero" placeholder="750" required>
 
-        <label for="acqua">Acqua (ml):</label>
+        <label for="acqua">Acqua (ml)</label>
         <input type="number" id="acqua" placeholder="1000" required>
 
-        <label for="alcool">Alcool (ml):</label>
+        <label for="alcool">Alcool (ml)</label>
         <input type="number" id="alcool" placeholder="800" required>
 
-        <label for="gradAlcool">Gradazione Alcool (% vol):</label>
+        <label for="gradAlcool">Gradazione Alcool (% vol)</label>
         <input type="number" id="gradAlcool" placeholder="96" required>
 
-        <button type="button" onclick="calcolaGradazione()">Calcola Gradazione</button>
+        <button type="button" onclick="calcolaGradazione()">Calcola gradazione</button>
     </form>
 
     <div id="result"></div>
 
     <!-- Sezione 2: Calcolo acqua e zucchero dati alcool e gradazione desiderata -->
-    <h2>Calcola acqua e zucchero per ottenere una gradazione desiderata</h2>
+    <h2>Calcola acqua e zucchero per ottenere la gradazione desiderata</h2>
     <form id="invForm">
-        <label for="alcoolInverso">Alcool (ml):</label>
+        <label for="alcoolInverso">Alcool (ml)</label>
         <input type="number" id="alcoolInverso" placeholder="800" required>
 
-        <label for="gradAlcoolInverso">Gradazione Alcool (% vol):</label>
+        <label for="gradAlcoolInverso">Gradazione Alcool (% vol)</label>
         <input type="number" id="gradAlcoolInverso" placeholder="96" required>
 
-        <label for="gradDesiderata">Gradazione desiderata (% vol):</label>
+        <label for="gradDesiderata">Gradazione desiderata (% vol)</label>
         <input type="number" id="gradDesiderata" placeholder="33.81" required>
 
-        <label for="proporzione">Proporzione acqua:zucchero:</label>
+        <label for="proporzione">Proporzione zucchero:acqua</label>
         <select id="proporzione">
             <option value="1:2">1:2 (500g / 1lt)</option>
             <option value="11:20">11:20 (550g / 1lt)</option>
@@ -54,7 +54,7 @@
             <option value="4:5">4:5 (800g / 1lt)</option>
         </select>
 
-        <button type="button" onclick="calcolaAcquaZucchero()">Calcola Acqua e Zucchero</button>
+        <button type="button" onclick="calcolaAcquaZucchero()">Calcola acqua e zucchero</button>
     </form>
 
     <div id="resultInv"></div>
