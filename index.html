@@ -1,65 +1,13 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Limoncello, il calcolatore di gradazione alcolica</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍋</text></svg>">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-    <h1>Calcolatore gradazione alcolica</h1>
-
-    <!-- Sezione 1: Calcolo della gradazione alcolica -->
-    <h2>Calcola gradazione con ingredienti noti</h2>
-    <form id="calcForm">
-        <label for="zucchero">Zucchero (g)</label>
-        <input type="number" id="zucchero" placeholder="750" required>
-
-        <label for="acqua">Acqua (ml)</label>
-        <input type="number" id="acqua" placeholder="1000" required>
-
-        <label for="alcool">Alcool (ml)</label>
-        <input type="number" id="alcool" placeholder="800" required>
-
-        <label for="gradAlcool">Gradazione Alcool (% vol)</label>
-        <input type="number" id="gradAlcool" placeholder="96" required>
-
-        <button type="button" onclick="calcolaGradazione()">Calcola gradazione</button>
-    </form>
-
-    <div id="result"></div>
-
-    <!-- Sezione 2: Calcolo acqua e zucchero dati alcool e gradazione desiderata -->
-    <h2>Calcola acqua e zucchero per ottenere la gradazione desiderata</h2>
-    <form id="invForm">
-        <label for="alcoolInverso">Alcool (ml)</label>
-        <input type="number" id="alcoolInverso" placeholder="800" required>
-
-        <label for="gradAlcoolInverso">Gradazione Alcool (% vol)</label>
-        <input type="number" id="gradAlcoolInverso" placeholder="96" required>
-
-        <label for="gradDesiderata">Gradazione desiderata (% vol)</label>
-        <input type="number" id="gradDesiderata" placeholder="33.81" required>
-
-        <label for="proporzione">Proporzione zucchero:acqua</label>
-        <select id="proporzione">
-            <option value="1:2">1:2 (500g / 1lt)</option>
-            <option value="11:20">11:20 (550g / 1lt)</option>
-            <option value="3:5">3:5 (600g / 1lt)</option>
-            <option value="13:20">13:20 (650g / 1lt)</option>
-            <option value="7:10">7:10 (700g / 1lt)</option>
-            <option value="8:11">8:11 (750g / 1lt)</option>
-            <option value="4:5">4:5 (800g / 1lt)</option>
-        </select>
-
-        <button type="button" onclick="calcolaAcquaZucchero()">Calcola acqua e zucchero</button>
-    </form>
-
-    <div id="resultInv"></div>
-
-    <!-- Collega il file JS esterno -->
-    <script src="script.js"></script>
-</body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + Vue</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>
