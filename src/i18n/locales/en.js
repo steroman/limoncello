@@ -21,7 +21,7 @@ export default {
           waterHelper: '1g of water equals 1ml',
           alcohol: 'Alcohol (g)',
           alcoholVol: 'Alcohol vol (%)',
-          alcoholHelper: 'The volume is expressed at 20º Celsius'
+          alcoholHelper: 'Assumes a 20°C temperature'
         }
       },
       waterSugar: {
