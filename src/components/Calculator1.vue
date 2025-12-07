@@ -2,13 +2,14 @@
 import { ref, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import HelperText from './HelperText.vue';
+
 import { 
-  calculateSugarVolume, 
-  calculateWaterVolume,
-  calculateAlcoholVolume, 
-  calculateTotalVolume,
-  calculateAlcoholContent 
+  calculateSyrupVolume,
+  calculateAlcoholVolume,
+  calculateTotalMixtureVolume,
+  calculateFinalABV
 } from '../utils/calculations';
+
 import { ALCOHOL_DENSITIES } from '../utils/constants';
 
 const { t } = useI18n();
@@ -35,24 +36,32 @@ function validate() {
 function calculate() {
   if (!validate()) return;
 
-  // Step 1: Water and alcohol volumes (remain unchanged)
-  const waterVol = calculateWaterVolume(inputs.water); // Water is 1:1 mass-to-volume
-  const alcoholVol = calculateAlcoholVolume(inputs.alcohol, inputs.alcoholStrength);
+  const sugarGrams = Number(inputs.sugar);
+  const waterGrams = Number(inputs.water);
+  const alcoholGrams = Number(inputs.alcohol);
 
-  // Step 2: Add sugar as mass directly to the total volume
-  const sugarMass = inputs.sugar; // Keep sugar as mass, do not convert to volume
-  const totalVol = waterVol + alcoholVol + sugarMass; // Add sugar mass directly
+  // New syrup model: realistic contraction accounted for
+  const syrupVol = calculateSyrupVolume(sugarGrams, waterGrams);
 
-  // Step 3: Calculate the alcohol content
-  const alcoholContent = calculateAlcoholContent(alcoholVol, inputs.alcoholStrength, totalVol);
+  // Alcohol volume (unchanged formula)
+  const alcoholVol = calculateAlcoholVolume(alcoholGrams, inputs.alcoholStrength);
 
-  // Step 4: Format results
+  // Total mixture volume using new syrup model
+  const totalVol = syrupVol + alcoholVol;
+
+  // Final alcohol percentage using new total volume
+  const alcoholContent = calculateFinalABV({
+    sugarGrams,
+    waterGrams,
+    alcoholGrams,
+    alcoholStrength: inputs.alcoholStrength
+  });
+
   result.value = {
     totalVolume: totalVol.toFixed(2),
-    alcoholContent: alcoholContent.toFixed(2),
+    alcoholContent: alcoholContent.toFixed(2)
   };
 }
-
 </script>
 
 <template>

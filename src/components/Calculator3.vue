@@ -2,12 +2,16 @@
 import { ref, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import HelperText from './HelperText.vue';
+
 import { 
-  calculateAlcoholVolume,
-  calculateTotalVolume,
+  calculateSyrupVolume,
   getAlcoholDensity
 } from '../utils/calculations';
-import { ALCOHOL_DENSITIES, SUGAR_WATER_PROPORTIONS } from '../utils/constants';
+
+import { 
+  ALCOHOL_DENSITIES, 
+  SUGAR_WATER_PROPORTIONS 
+} from '../utils/constants';
 
 const { t } = useI18n();
 
@@ -21,51 +25,157 @@ const inputs = reactive({
 const result = ref(null);
 const error = ref('');
 
+/**
+ * Simple validator
+ */
 function validate() {
   if (!inputs.totalVolume || !inputs.desiredStrength) {
     error.value = t('common.error');
     return false;
   }
+
+  const totalVolume = Number(inputs.totalVolume);
+  const desiredStrength = Number(inputs.desiredStrength);
+  const alcoholStrength = Number(inputs.alcoholStrength);
+
+  if (totalVolume <= 0 || desiredStrength <= 0) {
+    error.value = t('common.error');
+    return false;
+  }
+
+  if (desiredStrength >= alcoholStrength) {
+    error.value = t('common.error');
+    return false;
+  }
+
   error.value = '';
   return true;
+}
+
+/**
+ * For a given scale factor k (how much syrup we make),
+ * compute the total final volume using the realistic syrup
+ * model and the ABV constraint.
+ *
+ * k scales sugarBase and waterBase from SUGAR_WATER_PROPORTIONS.
+ */
+function computeTotalVolumeForK(k, ratio, desiredStrength, alcoholStrength) {
+  const sugarBase = ratio.sugar;
+  const waterBase = ratio.water;
+
+  const sugarMass = k * sugarBase;
+  const waterMass = k * waterBase;
+
+  // Syrup volume with contraction taken into account
+  const syrupVolume = calculateSyrupVolume(sugarMass, waterMass); // ml
+
+  const Sd = desiredStrength;      // %
+  const Sa = alcoholStrength;      // %
+
+  const ethanolFractionDesired = Sd / 100;
+  const alcoholStrengthFraction = Sa / 100;
+
+  // From derivation:
+  // V_a = (Sd * V_s) / (Sa - Sd)
+  const alcoholVolume = 
+    (ethanolFractionDesired * syrupVolume) / (alcoholStrengthFraction - ethanolFractionDesired);
+
+  const totalVolume = syrupVolume + alcoholVolume;
+
+  return {
+    totalVolume,
+    syrupVolume,
+    sugarMass,
+    waterMass,
+    alcoholVolume
+  };
 }
 
 function calculate() {
   if (!validate()) return;
 
-  // Step 1: Calculate the desired alcohol content in the final volume
-  const desiredAlcoholContent = inputs.totalVolume * (inputs.desiredStrength / 100); // Volume of pure alcohol (ml)
-  
-  // Step 2: Calculate the required alcohol volume based on alcohol strength
-  const requiredAlcoholVolume = desiredAlcoholContent / (inputs.alcoholStrength / 100); // Total alcohol volume (ml)
-  
-  // Step 3: Convert alcohol volume to weight using density
-  const alcoholDensity = getAlcoholDensity(inputs.alcoholStrength);
-  const requiredAlcoholWeight = (requiredAlcoholVolume * alcoholDensity) / 1000; // Weight in grams
+  const targetVolume = Number(inputs.totalVolume);       // ml
+  const desiredStrength = Number(inputs.desiredStrength); // %
+  const alcoholStrength = Number(inputs.alcoholStrength); // %
 
-  // Step 4: Calculate the remaining volume (sugar + water)
-  const remainingVolume = inputs.totalVolume - requiredAlcoholVolume; // Remaining volume in ml
-
-  // Step 5: Allocate remaining volume into sugar and water (by mass)
   const ratio = SUGAR_WATER_PROPORTIONS[inputs.sugarWaterRatio];
-  const totalParts = ratio.sugar + ratio.water; // Total parts in the ratio
-  const sugarProportion = ratio.sugar / totalParts;
-  const waterProportion = ratio.water / totalParts;
 
-  // Calculate sugar and water masses
-  const requiredSugarMass = remainingVolume * sugarProportion; // Sugar mass in grams
-  const requiredWaterMass = remainingVolume * waterProportion; // Water mass in grams
+  // ------------------------------------------------------------------
+  // 1. Find k such that totalVolume(k) ≈ targetVolume using bisection
+  // ------------------------------------------------------------------
+  let kLow = 0;
+  let kHigh = 1;
+  let vHigh = computeTotalVolumeForK(kHigh, ratio, desiredStrength, alcoholStrength).totalVolume;
 
-  // Step 6: Return results
+  // Expand kHigh until we exceed targetVolume
+  let safetyCounter = 0;
+  while (vHigh < targetVolume && safetyCounter < 50) {
+    kHigh *= 2;
+    vHigh = computeTotalVolumeForK(kHigh, ratio, desiredStrength, alcoholStrength).totalVolume;
+    safetyCounter++;
+  }
+
+  // If we still didn't exceed, something is off; bail out gracefully
+  if (vHigh < targetVolume) {
+    error.value = t('common.error');
+    result.value = null;
+    return;
+  }
+
+  // Bisection search
+  let best = null;
+  const maxIterations = 50;
+  for (let i = 0; i < maxIterations; i++) {
+    const kMid = (kLow + kHigh) / 2;
+    const dataMid = computeTotalVolumeForK(kMid, ratio, desiredStrength, alcoholStrength);
+    const diff = dataMid.totalVolume - targetVolume;
+
+    best = dataMid;
+
+    if (Math.abs(diff) < 0.0001) {
+      break;
+    }
+
+    if (diff > 0) {
+      // Too much volume → reduce k
+      kHigh = kMid;
+    } else {
+      // Too little volume → increase k
+      kLow = kMid;
+    }
+  }
+
+  if (!best) {
+    error.value = t('common.error');
+    result.value = null;
+    return;
+  }
+
+  const { sugarMass, waterMass, alcoholVolume } = best;
+
+  // ------------------------------------------------------------------
+  // 2. Convert alcohol volume → mass using alcohol density
+  // ------------------------------------------------------------------
+  const density_g_L = getAlcoholDensity(alcoholStrength);
+  if (!density_g_L) {
+    error.value = t('common.error');
+    result.value = null;
+    return;
+  }
+
+  const density_g_ml = density_g_L / 1000;
+  const alcoholMass = alcoholVolume * density_g_ml;
+
+  // ------------------------------------------------------------------
+  // 3. Set final results for UI (we keep targetVolume as displayed)
+  // ------------------------------------------------------------------
   result.value = {
-    sugar: requiredSugarMass.toFixed(2),
-    water: requiredWaterMass.toFixed(2),
-    alcohol: requiredAlcoholWeight.toFixed(2),
-    totalVolume: inputs.totalVolume.toFixed(2) // Ensure total volume is included in the output
+    sugar: sugarMass.toFixed(2),
+    water: waterMass.toFixed(2),
+    alcohol: alcoholMass.toFixed(2),
+    totalVolume: targetVolume.toFixed(2)
   };
 }
-
-
 </script>
 
 <template>
@@ -144,7 +254,9 @@ function calculate() {
     </div>
 
     <div v-if="result" class="bg-gray-50 rounded-lg p-4">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">{{ t('common.results') }}</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        {{ t('common.results') }}
+      </h3>
       <div class="space-y-2 text-sm">
         <p class="flex justify-between">
           <span class="text-gray-600">{{ t('common.requiredSugar') }}:</span>
