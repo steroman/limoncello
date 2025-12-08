@@ -33,3 +33,20 @@ export const ALCOHOL_DENSITIES = [
   { strength: 99, density: 794.25 },
   { strength: 100, density: 789.24 }
 ];
+
+export const SYRUP_DENSITIES = [
+  { brix:   0, density: 0.99717 },
+  { brix:   5, density: 1.01680 },
+  { brix:  10, density: 1.03709 },
+  { brix:  15, density: 1.05811 },
+  { brix:  20, density: 1.07991 },
+  { brix:  25, density: 1.10251 },
+  { brix:  30, density: 1.12594 },
+  { brix:  35, density: 1.15024 },
+  { brix:  40, density: 1.17541 },
+  { brix:  45, density: 1.20151 },
+  { brix:  50, density: 1.22854 },
+  { brix:  55, density: 1.25651 },
+  { brix:  60, density: 1.28544 }
+  // — you can extend further if you like
+];
