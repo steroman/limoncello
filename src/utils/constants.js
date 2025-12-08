@@ -35,6 +35,7 @@ export const ALCOHOL_DENSITIES = [
 ];
 
 export const SYRUP_DENSITIES = [
+/* Source: https://ttngmai.wordpress.com/wp-content/uploads/2013/10/thesoftdrinks.pdf */
   { brix:   0, density: 0.99717 },
   { brix:   5, density: 1.01680 },
   { brix:  10, density: 1.03709 },

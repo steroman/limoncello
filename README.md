@@ -26,9 +26,10 @@ It uses a density-based model that takes into account the contraction of the sol
 - [How to run it](#how-to-run-it)
   - [Use the website](#use-the-website)
   - [Run locally](#run-locally)
-- [Developing](#developing)
+- [Developing](#developing)git c
 - [Project structure](#project-structure)
 - [Limitations & assumptions](#limitations)
+- [Credits and attributions](#credits-and-attributions)
 
 ## The 3 calculators
 
@@ -276,3 +277,11 @@ npm run dev
 - Assumes sugar, water, ethanol only
 - Uses linear interpolation for brix density
 - Reference brix values are limited to 0-60, as the sugar-to-water ratio is limited to fixed values.
+
+## Credits and attributions
+
+Some material used for the app comes from the following PDFs found online:
+
+- [DENSITY OF ETHANOL STRENGTH BY VOLUME (V/V) on `Plantagea.hr` (PDF)](https://www.plantagea.hr/wp-content/uploads/2021/09/Dilution-of-ethanol.pdf)
+- [Brix/Density Conversion
+Tables from The Soft Drinks Companion book, retrieved from `ttngmai.wordpress.com` (PDF)](https://ttngmai.wordpress.com/wp-content/uploads/2013/10/thesoftdrinks.pdf)
